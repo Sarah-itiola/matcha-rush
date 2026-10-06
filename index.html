@@ -5,71 +5,217 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Matcha Rush</title>
+    <title>Matcha Rush ♡</title>
+
+    <meta
+        name="description"
+        content="Catch the ingredients, avoid the coffee and become a Matcha Rush legend."
+    >
 
     <link rel="stylesheet" href="css/index.css">
 
     <script src="https://cdn.jsdelivr.net/npm/p5@1/lib/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
     <header class="game-header">
+        <p class="eyebrow">THE MATCHA ARCADE</p>
+
         <h1>Matcha Rush ♡</h1>
-        <p>Collect the good stuff, avoid the chaos.</p>
+
+        <p class="subtitle">
+            Catch the ingredients. Avoid the coffee. Claim the leaderboard.
+        </p>
     </header>
 
     <main class="game-layout">
 
-        <section class="game">
+        <section class="game-card">
 
-            <section class="score">
-                <p>Score</p>
-                <strong id="score">0 ♡</strong>
+            <section class="stats">
 
-                <p>High score</p>
-                <span id="high-score">0</span>
+                <article class="stat">
+                    <p>Score</p>
+                    <strong id="score">0 ♡</strong>
+                </article>
 
-                <p>Last score</p>
-                <span id="last-score">0</span>
+                <article class="stat">
+                    <p>Personal best</p>
+                    <strong id="high-score">0</strong>
+                </article>
+
+                <article class="stat">
+                    <p>Last run</p>
+                    <strong id="last-score">0</strong>
+                </article>
+
             </section>
 
-            <section id="game-container"></section>
+            <section class="game-stage">
+
+                <section id="game-container"></section>
+
+                <section id="game-over-panel" class="game-over-panel hidden">
+
+                    <p class="game-over-small">GAME OVER</p>
+
+                    <h2 id="game-over-title">
+                        Matcha spilled 💔
+                    </h2>
+
+                    <p class="final-score-text">
+                        You scored
+                        <strong id="final-score">0</strong>
+                        points
+                    </p>
+
+                    <label for="player-name">
+                        Enter your name for the leaderboard
+                    </label>
+
+                    <section class="save-score-row">
+
+                        <input
+                            id="player-name"
+                            type="text"
+                            maxlength="16"
+                            placeholder="Your name"
+                            autocomplete="off"
+                        >
+
+                        <button id="save-score-button">
+                            Save score ♡
+                        </button>
+
+                    </section>
+
+                    <p id="save-message" class="save-message"></p>
+
+                    <button id="restart-button" class="restart-button">
+                        Play again
+                    </button>
+
+                </section>
+
+            </section>
+
+            <section class="mobile-controls">
+
+                <button id="move-left" aria-label="Move left">
+                    ←
+                </button>
+
+                <button id="move-right" aria-label="Move right">
+                    →
+                </button>
+
+            </section>
+
+            <p class="game-tip">
+                Catch every ingredient — missing one ends the run.
+            </p>
 
         </section>
 
-        <aside class="instructions">
+        <aside class="sidebar">
 
-            <h2>How to play ♡</h2>
+            <section class="leaderboard">
 
-            <section class="instruction">
-                <span>← →</span>
-                <p>Move left and right</p>
+                <section class="leaderboard-heading">
+
+                    <section>
+                        <p class="small-title">GLOBAL</p>
+                        <h2>Matcha Legends ♡</h2>
+                    </section>
+
+                    <span class="live-badge">
+                        ● LIVE
+                    </span>
+
+                </section>
+
+                <section id="leaderboard-list" class="leaderboard-list">
+
+                    <article class="leaderboard-loading">
+                        Loading leaderboard...
+                    </article>
+
+                </section>
+
+                <p class="leaderboard-note">
+                    Top 3 highest scores ever
+                </p>
+
             </section>
 
-            <section class="instruction">
-                <span>🍓</span>
-                <p>Catch ingredients for points</p>
+            <section class="instructions">
+
+                <h2>How to play ♡</h2>
+
+                <section class="instruction">
+                    <span>← →</span>
+                    <p>Move your matcha</p>
+                </section>
+
+                <section class="instruction">
+                    <span>🍓</span>
+                    <p>Catch ingredients</p>
+                </section>
+
+                <section class="instruction">
+                    <span>☕</span>
+                    <p>Avoid the coffee</p>
+                </section>
+
+                <section class="instruction">
+                    <span>R</span>
+                    <p>Restart after losing</p>
+                </section>
+
+                <p class="message">
+                    How long can you keep your matcha alive?
+                </p>
+
             </section>
-
-            <section class="instruction">
-    <span>☕</span>
-    <p>Avoid the coffee!</p>
-</section>
-
-            <section class="instruction">
-                <span>R</span>
-                <p>Restart the game</p>
-            </section>
-
-            <p class="message">Build your perfect matcha ♡</p>
 
         </aside>
 
     </main>
 
     <footer>
-        <p>Made with matcha & code ♡</p>
+
+        <p class="made-by">
+            Made by <strong>Sarah Itiola</strong> ♡
+        </p>
+
+        <section class="social-links">
+
+            <a
+                href="https://www.instagram.com/sarah.itiola/"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Instagram
+            </a>
+
+            <span>♡</span>
+
+            <a
+                href="https://www.tiktok.com/@sarah.itiola"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                TikTok
+            </a>
+
+        </section>
+
+        <p class="footer-small">
+            © 2026 Matcha Rush. All rights reserved.
+        </p>
+
     </footer>
 
     <script src="index.js"></script>
@@ -77,5 +223,3 @@
 </body>
 
 </html>
-hi
-test
