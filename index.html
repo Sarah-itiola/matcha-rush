@@ -33,8 +33,8 @@ aside { display: grid; gap: 12px; }
     -webkit-touch-callout: none;
     touch-action: none;
 }
-.end-card { width: min(100%, 390px); gap: 10px; padding: 22px 18px; border: 1px solid #e9b8ca; border-radius: 24px; background: #fff8f9; box-shadow: 0 12px 30px #4a68451c; }
-.end-logo { width: 96px; height: 96px; object-fit: contain; margin-bottom: 4px; filter: drop-shadow(0 5px 7px #47673a18); }
+.end-card { width: min(100%, 420px); gap: 10px; padding: 22px 18px; border: 1px solid #e9b8ca; border-radius: 24px; background: #fff8f9; box-shadow: 0 12px 30px #4a68451c; }
+.end-logo { display: block; flex: 0 0 auto; width: clamp(118px, 22vw, 160px); height: clamp(118px, 22vw, 160px); object-fit: contain; margin: 0 auto 8px; filter: drop-shadow(0 5px 7px #47673a18); }
 .end-card h2 { font-family: "DM Serif Text", Georgia, serif; font-weight: 400; font-size: clamp(1.4rem, 3vw, 1.9rem); line-height: 1.18; }
 .end-card .end-note { font-size: .9rem; line-height: 1.45; color: #637459; max-width: 290px; }
 .end-card .end-reason { display: none !important; }
@@ -114,7 +114,7 @@ a { color: inherit; }
 </div>
 <div id="game-over-panel" class="game-overlay hidden">
 <div class="overlay-card end-card">
-<img class="brand-logo end-logo" width="78" height="78" alt="Matcha Rush logo" src="data:image/png;base64,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">
+
 <h2>Thank you for playing Matcha Rush ♡</h2>
 <p class="end-note">A little matcha, a little chaos. xoxo ♡</p>
 <p id="game-over-title" class="end-reason" hidden>Matcha spilled 💔</p>
@@ -146,11 +146,11 @@ a { color: inherit; }
 </section>
 <section>
 <h2>How to play</h2>
-<p class="how-intro">Catch the ingredients, avoid the coffee, and beat your personal best.</p>
+<p class="how-intro">Catch the ingredients, dodge the obstacles, and beat your personal best.</p>
 <div class="how-group"><h3>Move your cup</h3><p>Use the <strong>← → arrow keys</strong>, hold the buttons below the game, or drag your cup on mobile.</p></div>
-<div class="how-group"><h3>Catch &amp; dodge</h3><span class="how-chip">🍓 Strawberry</span><span class="how-chip">🫐 Blueberry</span><span class="how-chip">🍯 Honey</span><span class="how-chip">🥛 Milk</span><span class="how-chip">🍵 Matcha</span><span class="how-chip">🍦 Vanilla</span><span class="how-chip">🥭 Mango</span><span class="how-chip">🍑 Peach</span><span class="how-chip">🍒 Cherry</span><span class="how-chip">🥥 Coconut</span><span class="how-chip">🍌 Banana</span><p><strong>☕ Coffee</strong> is the obstacle. Don't catch it!</p><p class="how-note">🥤 Giant Cup (10s) · 🚀 Turbo (12s) · ⏳ Slow Motion (12s) · 🛡️ Shield · 🧲 Magnet · ❄️ Freeze</p></div>
-    <div class="how-group"><h3>Classic · Giveaway</h3><p>Catch ingredients, dodge coffee and climb the levels. The longer you play, the harder it gets. Your Classic score counts toward the giveaway.</p></div>
-    <div class="how-group"><h3>Arcade 2.0</h3><p>Five lives, faster levels, wild coffee storms and extra challenges. Boosts, combos and achievements make every run different.</p><p class="how-note">Arcade scores are just for fun — not the giveaway.</p></div>
+<div class="how-group"><h3>Catch &amp; dodge</h3><span class="how-chip">🍓 Strawberry</span><span class="how-chip">🫐 Blueberry</span><span class="how-chip">🍯 Honey</span><span class="how-chip">🥛 Milk</span><span class="how-chip">🍵 Matcha</span><span class="how-chip">🍦 Vanilla</span><span class="how-chip">🥭 Mango</span><span class="how-chip">🍑 Peach</span><span class="how-chip">🍒 Cherry</span><span class="how-chip">🥥 Coconut</span><span class="how-chip">🍌 Banana</span><p><strong>Avoid:</strong> ☕ Coffee · 🌶️ Chilli · 🧄 Garlic · 🧅 Onion</p><p class="how-note">🥤 Giant Cup (10s) · 🚀 Turbo (12s) · ⏳ Slow Motion (12s) · 🛡️ Shield · 🧲 Magnet · ❄️ Freeze</p></div>
+    <div class="how-group"><h3>Classic · Giveaway</h3><p>Catch ingredients, dodge the obstacles and climb the levels. The longer you play, the harder it gets. Your Classic score counts toward the giveaway.</p></div>
+    <div class="how-group"><h3>Arcade 2.0</h3><p>Five lives, faster levels, surprise obstacles and extra challenges. Boosts, combos and achievements make every run different.</p><p class="how-note">Arcade scores are just for fun — not the giveaway.</p></div>
 </section>
 </aside>
 </main>
@@ -206,8 +206,6 @@ let arcadeBoosts = {double:0,shield:0,speed:0,magnet:0,freeze:0,frenzy:0,giant:0
 let classicElapsed=0, classicLevel=1, classicCombo=0, classicCaught=0;
 let classicBoosts={shield:0,magnet:0,freeze:0,double:0,speed:0,frenzy:0,giant:0,turbo:0,slow:0};
 let classicBoostKind="";
-let classicBoostQuota={used:0,nextAt:20,initial:true,lastCaught:0};
-let arcadeBoostQuota={used:0,nextAt:20,initial:true,lastCaught:0};
 let arcadeBanner = "";
 let arcadeBannerUntil = 0;
 let arcadeInvulnerableUntil = 0;
@@ -226,39 +224,33 @@ const achievementDefinitions = [
     {id:"level5",name:"Matcha Master",test:()=>(gameMode==="arcade"?arcadeLevel:classicLevel)>=5},
     {id:"survive",name:"Survivor",test:()=>(gameMode==="arcade"?arcadeElapsed:classicElapsed)>=120}
 ];
-// At most two timed boosters. Opposing or redundant speed effects cannot stack.
+// Each booster type has its own 30-second pickup cooldown, independent of other types.
+// Two compatible boosters can overlap, but conflicting movement effects never stack.
 const boostConflicts={
     speed:["turbo","slow","freeze"], turbo:["speed","slow","freeze"],
     slow:["speed","turbo","freeze"], freeze:["speed","turbo","slow"]
 };
-// Earned power-ups: time AND successful ingredient catches are required.
-// Two early rewards, a 60-second rest, then one reward per 45-second window.
-function boosterQuota(mode){return mode==="classic"?classicBoostQuota:arcadeBoostQuota;}
-function boosterCatchCount(mode){return mode==="classic"?classicCaught:arcadeCaught;}
-function boosterReady(mode,elapsed){
-    const quota=boosterQuota(mode);
-    if(elapsed<quota.nextAt) return false;
-    const catchesNeeded=quota.initial?(quota.used===0?10:15):(mode==="arcade"?10:15);
-    return boosterCatchCount(mode)-quota.lastCaught>=catchesNeeded;
-}
-function recordBoosterPickup(mode,elapsed){
-    const quota=boosterQuota(mode);
-    quota.lastCaught=boosterCatchCount(mode);
-    if(quota.initial){
-        quota.used++;
-        if(quota.used>=2){quota.initial=false;quota.nextAt=elapsed+60;}
-        else quota.nextAt=elapsed+30;
-    }else quota.nextAt=elapsed+45;
-}
+const boostPickupCooldown=30;
+const boostLastPicked={classic:{},arcade:{}};
+function boostPickupHistory(boosts){return boosts===classicBoosts?boostLastPicked.classic:boostLastPicked.arcade;}
 function canActivateBoost(boosts,kind,elapsed){
+    const picked=boostPickupHistory(boosts);
+    if(picked[kind]!==undefined && elapsed-picked[kind]<boostPickupCooldown) return false;
     const active=Object.keys(boosts).filter(k=>boosts[k]>elapsed);
-    if(active.includes(kind)) return true; // Refresh an existing booster.
     if(active.length>=2) return false;
     return !active.some(k=>(boostConflicts[k]||[]).includes(kind));
 }
-function activateBoost(boosts,kind,elapsed,seconds){
+function activateBoost(boosts,kind,elapsed){
     if(!canActivateBoost(boosts,kind,elapsed)) return false;
-    boosts[kind]=elapsed+seconds;
+    const active=Object.keys(boosts).filter(k=>boosts[k]>elapsed);
+    const duration=(kind==="shield"||kind==="double"||kind==="giant")?10:3;
+    boosts[kind]=elapsed+duration;
+    boostPickupHistory(boosts)[kind]=elapsed;
+    // Catch two DIFFERENT compatible boosters close together: both get 10 seconds.
+    if(active.length){
+        for(const other of active) boosts[other]=Math.max(boosts[other],elapsed+10);
+        boosts[kind]=Math.max(boosts[kind],elapsed+10);
+    }
     return true;
 }
 function availableBoostKinds(boosts,elapsed,kinds){
@@ -319,6 +311,14 @@ document.getElementById("sound-toggle").addEventListener("click",()=>{
 });
 const arcadeLevelNames = ["Matcha Beginner","Barista Era","Matcha Madness","Caffeine Chaos","Matcha Queen"];
 
+
+// New hazards unlock gradually in Classic; Arcade unlocks them more gently.
+const avoidIngredients = ["☕", "🌶️", "🧄", "🧅"];
+function unlockedHazards(mode, points, elapsed) {
+    // Coffee and chilli from the start; garlic and onion join at 60 points.
+    return points >= 60 ? avoidIngredients : avoidIngredients.slice(0, 2);
+}
+function isHazard(emoji) { return avoidIngredients.includes(emoji); }
 
 const goodIngredients = [
     "🍓",
@@ -431,16 +431,16 @@ function movePlayer() {
 
 
 function moveFood() {
-    let foodSpeed = Math.min(16,3 + classicElapsed*.014 + (classicLevel-1)*.32 + classicCaught*.015);
+    let foodSpeed = Math.min(16,3.5 + classicElapsed*.018 + (classicLevel-1)*.36 + classicCaught*.019);
     if(classicBoosts.freeze>classicElapsed) foodSpeed*=.5;
     if(classicBoosts.slow>classicElapsed) foodSpeed*=.65;
-    if(classicBoosts.magnet>classicElapsed && food!=="☕" && !classicBoostKind && foodY>160) foodX+=(playerX-foodX)*Math.min(.12*frameStep, .3);
+    if(classicBoosts.magnet>classicElapsed && !isHazard(food) && !classicBoostKind && foodY>160) foodX+=(playerX-foodX)*Math.min(.12*frameStep, .3);
 
     foodY = foodY + foodSpeed * frameStep;
 
     if (foodY > 500) {
 
-        if (food == "☕" || classicBoostKind) {
+        if (isHazard(food) || classicBoostKind) {
             newFood();
         } else if(classicBoosts.shield>classicElapsed){
             classicBoosts.shield=0;classicCombo=0;newFood();playSound("boost");
@@ -459,7 +459,7 @@ function drawPlayer() {
         fill(255,255,255,90); circle(playerX,playerY,75); noFill(); stroke("#f7f7ff"); strokeWeight(3); circle(playerX,playerY,70); noStroke();
     }
     const giantActive = gameMode === "classic" ? classicBoosts.giant > classicElapsed : arcadeBoosts.giant > arcadeElapsed;
-    textSize(giantActive ? 90 : 48);
+    textSize(giantActive ? 105 : 48);
 
     text(
         "🍵",
@@ -489,21 +489,20 @@ function checkCollision() {
         foodY
     );
 
-    if (distance < (classicBoosts.giant > classicElapsed ? 65 : 38)) {
+    if (distance < (classicBoosts.giant > classicElapsed ? 78 : 38)) {
 
         if(classicBoostKind){
-            const seconds=({shield:15,freeze:8,magnet:10,frenzy:10,giant:10,turbo:12,slow:12})[classicBoostKind]||30;
-            const activated=boosterReady("classic",classicElapsed) && activateBoost(classicBoosts,classicBoostKind,classicElapsed,seconds);
-            if(activated)recordBoosterPickup("classic",classicElapsed);
-            arcadeMessage(activated?classicBoostKind.toUpperCase()+" BOOST!":"MAX 2 BOOSTS · WAIT FOR ONE TO EXPIRE",2);
+            const activated=activateBoost(classicBoosts,classicBoostKind,classicElapsed);
+            arcadeMessage(activated?classicBoostKind.toUpperCase()+" BOOST!":"BOOST UNAVAILABLE · TRY ANOTHER",2);
             if(activated)playSound("boost");newFood();
-        } else if (food == "☕") {
+        } else if (isHazard(food)) {
             if(classicBoosts.shield>classicElapsed){classicBoosts.shield=0;classicCombo=0;playSound("boost");newFood();}
-            else {playSound("coffee");endGame("Coffee ruined the matcha ☕");}
+            else {playSound("coffee");endGame("A tricky ingredient slipped in!");}
         } else {
             classicCaught++;classicCombo++;
-            // Giveaway points remain one per ingredient; multipliers are visual-only in Classic.
-            score = score + 1;
+            const points = classicBoosts.double > classicElapsed ? 2 : 1;
+            score += points;
+            if(points===2) arcadeMessage("DOUBLE POINTS! +2",0.9);
             playSound("catch");
 
             makeParticles();
@@ -518,8 +517,8 @@ function checkCollision() {
 
 function newFood() {
     foodY = -30;
-    const classicOptions=availableBoostKinds(classicBoosts,classicElapsed,["giant","giant","turbo","slow","speed","shield","magnet","freeze"]);
-    classicBoostKind=(playing && gameMode==="classic" && classicCaught>=2 && boosterReady("classic",classicElapsed) && classicOptions.length && random(1)<.22) ? random(classicOptions) : "";
+    const classicOptions=availableBoostKinds(classicBoosts,classicElapsed,["giant","giant","turbo","slow","speed","shield","magnet","freeze","double","double"]);
+    classicBoostKind=(playing && gameMode==="classic" && classicOptions.length && random(1)<.29) ? random(classicOptions) : "";
 
     foodX = random(
         35,
@@ -528,9 +527,9 @@ function newFood() {
 
     let coffeeChance = random(1);
 
-    if (coffeeChance < Math.min(.42,.2+classicElapsed*.00035)) {
+    if (coffeeChance < Math.min(.55,.32+classicElapsed*.0012+Math.min(.08,score*.0006))) {
 
-        food = "☕";
+        food = random(unlockedHazards("classic",score,classicElapsed));
 
     } else {
 
@@ -677,7 +676,7 @@ function restartGame() {
 
     particles = [];
     if (gameMode === "arcade") resetArcade();
-    else {classicElapsed=0;classicBoostQuota={used:0,nextAt:20,initial:true,lastCaught:0};classicLevel=1;classicCombo=0;classicCaught=0;classicBoostKind="";classicBoosts={shield:0,magnet:0,freeze:0,double:0,speed:0,frenzy:0,giant:0,turbo:0,slow:0};arcadeBannerUntil=0;document.getElementById("achievement-toast").classList.add("hidden");updateArcadeHud();}
+    else {classicElapsed=0;classicLevel=1;classicCombo=0;classicCaught=0;classicBoostKind="";classicBoosts={shield:0,magnet:0,freeze:0,double:0,speed:0,frenzy:0,giant:0,turbo:0,slow:0};boostLastPicked.classic={};arcadeBannerUntil=0;document.getElementById("achievement-toast").classList.add("hidden");updateArcadeHud();}
 
     document.getElementById(
         "game-over-panel"
@@ -1105,9 +1104,10 @@ document.getElementById(
 
 // Arcade 2.0 is separate from the Classic Christmas giveaway leaderboard.
 function resetArcade() {
-    arcadeItems=[]; arcadeBoostQuota={used:0,nextAt:20,initial:true,lastCaught:0}; arcadeLives=5; arcadeLevel=1; arcadeCaught=0;
+    arcadeItems=[]; arcadeLives=5; arcadeLevel=1; arcadeCaught=0;
     arcadeCombo=0; arcadeMaxCombo=0; arcadeElapsed=0; arcadeSpawnTimer=0;
     arcadeBoosts={double:0,shield:0,speed:0,magnet:0,freeze:0,frenzy:0,giant:0,turbo:0,slow:0};
+    boostLastPicked.arcade={};
     arcadeStormUntil=0; arcadeInvulnerableUntil=0;
     arcadeBanner="READY, SET, MATCHA! ♡"; arcadeBannerUntil=2;
     document.getElementById("achievement-toast").classList.add("hidden");
@@ -1117,9 +1117,9 @@ function arcadeSpawn() {
     const r=random(1), storm=arcadeStormUntil>arcadeElapsed;
     let kind="good", emoji=random(goodIngredients);
     // Arcade is feature-rich, not punishing: most drops are ingredients or boosts.
-    const coffeeChance=storm?.23:Math.min(.20,.10+arcadeElapsed*.00012);
-    if(r<coffeeChance){kind="coffee";emoji="☕";}
-    else if(r<coffeeChance+.32 && boosterReady("arcade",arcadeElapsed)){
+    const coffeeChance=storm?.29:Math.min(.28,.16+arcadeElapsed*.00028);
+    if(r<coffeeChance){kind="hazard";emoji=random(unlockedHazards("arcade",score,arcadeElapsed));}
+    else if(r<coffeeChance+.34){
         const options=availableBoostKinds(arcadeBoosts,arcadeElapsed,["giant","giant","turbo","slow","shield","magnet","freeze","double","speed","frenzy"]);
         kind=random(options.length?[...options,"heart","gold"]:["heart","gold"]);
         emoji=kind==="heart"?"💗":kind==="gold"?"🏆":powerEmoji[kind];
@@ -1140,17 +1140,16 @@ function arcadeHurt() {
     if(arcadeLives<=0) {playSound("over");endGame("Matcha spilled 💔");}
 }
 function arcadeCatch(item) {
-    if (item.kind==="coffee") {arcadeHurt();return;}
+    if (item.kind==="hazard" || item.kind==="coffee") {arcadeHurt();return;}
     if (["double","speed","shield","magnet","freeze","frenzy","giant","turbo","slow"].includes(item.kind)) {
-        const seconds=({shield:15,magnet:10,freeze:8,frenzy:10,giant:10,turbo:12,slow:12})[item.kind]||30;
-        const activated=boosterReady("arcade",arcadeElapsed) && activateBoost(arcadeBoosts,item.kind,arcadeElapsed,seconds);
-        if(activated)recordBoosterPickup("arcade",arcadeElapsed);
-        arcadeMessage(activated?item.kind.toUpperCase()+" BOOST ACTIVATED!":"MAX 2 BOOSTS · WAIT FOR ONE TO EXPIRE",2);
+        const activated=activateBoost(arcadeBoosts,item.kind,arcadeElapsed);
+        arcadeMessage(activated?item.kind.toUpperCase()+" BOOST ACTIVATED!":"BOOST UNAVAILABLE · TRY ANOTHER",2);
         if(activated)playSound("boost");
     } else if (item.kind==="heart") {
         arcadeLives=Math.min(5,arcadeLives+1);arcadeMessage("EXTRA LIFE!");playSound("boost");
     } else {
         const multiplier=arcadeBoosts.double>arcadeElapsed?2:1;
+        if(multiplier===2 && item.kind==="good") arcadeMessage("DOUBLE POINTS! +2",0.9);
         score+=(item.kind==="gold"?50:1)*multiplier;
         arcadeCaught++;arcadeCombo++;
         arcadeMaxCombo=Math.max(arcadeMaxCombo,arcadeCombo);
@@ -1190,7 +1189,7 @@ function updateArcade() {
         item.y+=item.speed*frameStep*(storm?1.08:1)*(arcadeBoosts.freeze>arcadeElapsed?.5:1)*(arcadeBoosts.slow>arcadeElapsed?.65:1);
         if(item.wave)item.x=Math.max(30,Math.min(610,item.x+Math.sin(arcadeElapsed*5+item.phase)*2.5*frameStep));
         if(arcadeBoosts.magnet>arcadeElapsed && item.kind==="good" && item.y>140)item.x+=(playerX-item.x)*Math.min(.12*frameStep,.3);
-        if(dist(playerX,playerY,item.x,item.y)<(arcadeBoosts.giant>arcadeElapsed?65:37)) {
+        if(dist(playerX,playerY,item.x,item.y)<(arcadeBoosts.giant>arcadeElapsed?78:37)) {
             arcadeItems.splice(i,1);arcadeCatch(item);
             if(gameOver) break;
         } else if(item.y>510) {
@@ -1215,7 +1214,7 @@ function updateArcadeHud() {
     document.getElementById("level-label").textContent="Level "+lvl+" · "+arcadeLevelNames[(lvl-1)%arcadeLevelNames.length];
     document.getElementById("lives-label").textContent=isClassic?"Survive & level up":"💗".repeat(arcadeLives)+"♡".repeat(5-arcadeLives);
     const boosts=Object.entries(boostsNow).filter(([,end])=>end>elapsed).map(([kind,end])=>powerEmoji[kind]+" "+Math.ceil(end-elapsed)+"s");
-    document.getElementById("boost-label").textContent=boosts.join(" · ") || "Boosts: earn as you play";
+    document.getElementById("boost-label").textContent=boosts.join(" · ") || "Boosts: catch to activate";
     document.getElementById("combo-label").textContent="Combo "+(isClassic?classicCombo:arcadeCombo);
 }
 function setMode(mode) {
@@ -1225,8 +1224,8 @@ function setMode(mode) {
     document.getElementById("arcade-mode").classList.toggle("mode-selected",mode==="arcade");
     document.getElementById("arcade-hud").hidden=false;
     document.getElementById("achievement-toast").classList.add("hidden");
-    document.getElementById("mode-description").textContent=mode==="classic"?"Classic · endless levels, boosters and original giveaway scoring":"Arcade 2.0 · endless levels, 5 lives, power-ups!";
-    document.getElementById("game-tip").textContent=mode==="classic"?"Classic: harder every minute · levels · boosters · one point per ingredient.":"Arcade: 5 lives · endless levels · combo bonuses · coffee storms!";
+    document.getElementById("mode-description").textContent=mode==="classic"?"Classic · endless levels, boosters and giveaway leaderboard":"Arcade 2.0 · endless levels, 5 lives, power-ups!";
+    document.getElementById("game-tip").textContent=mode==="classic"?"Classic: harder every minute · levels · timed boosters · double points.":"Arcade: 5 lives · endless levels · combo bonuses · obstacles!";
     document.querySelector('label[for="player-name"]').hidden=mode!=="classic";
     document.querySelector('.save-score-row').hidden=mode!=="classic";
     if(gameOver) {
