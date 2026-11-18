@@ -88,7 +88,7 @@ a { color: inherit; }
 <section class="game-card" aria-label="Matcha Rush game">
 <div class="mode-picker"><button id="classic-mode" class="mode-selected" type="button">🏆 Classic · Giveaway</button><button id="arcade-mode" type="button">Arcade 2.0</button></div>
 <div class="sound-row"><button id="sound-toggle" class="sound-toggle" type="button" aria-label="Mute game sounds">Sound on</button></div>
-<div id="arcade-hud" class="arcade-hud" hidden><strong id="level-label">Level 1 · Matcha Beginner</strong><span id="lives-label">💗💗💗</span><span id="boost-label">Catch a power-up!</span><span id="combo-label">Combo 0</span></div>
+<div id="arcade-hud" class="arcade-hud"><strong id="level-label">Level 1 · Matcha Beginner</strong><span id="lives-label">💗💗💗</span><span id="boost-label">Catch a power-up!</span><span id="combo-label">Combo 0</span></div>
 <div class="stats">
 <div class="stat"><span>Score</span><strong id="score">0 ♡</strong></div>
 <div class="stat"><span>Personal best</span><strong id="high-score">0</strong></div>
@@ -128,7 +128,7 @@ a { color: inherit; }
 <aside>
 <section>
 <h2>Matcha Legends ♡</h2>
-<p>Top 10 global players · Classic giveaway scores only</p>
+<p>Top 4 global players · Classic giveaway scores only</p>
 <div id="giveaway-leader" class="giveaway-leader" aria-live="polite"><span class="giveaway-eyebrow">CURRENT GIVEAWAY LEADER</span><strong id="giveaway-leader-name">Loading…</strong><span id="giveaway-leader-score"></span></div>
 <div id="leaderboard-list">Loading leaderboard…</div>
 </section>
@@ -136,9 +136,9 @@ a { color: inherit; }
 <h2>How to play</h2>
 <p class="how-intro">Catch the ingredients, avoid the coffee, and beat your personal best.</p>
 <div class="how-group"><h3>Move your cup</h3><p>Use the <strong>← → arrow keys</strong>, hold the buttons below the game, or drag your cup on mobile.</p></div>
-<div class="how-group"><h3>Catch &amp; dodge</h3><span class="how-chip">🍓 Strawberry</span><span class="how-chip">🫐 Blueberry</span><span class="how-chip">🍯 Honey</span><span class="how-chip">🥛 Milk</span><p><strong>☕ Coffee</strong> is the obstacle. Don't catch it!</p></div>
-<div class="how-group"><h3>Classic · Giveaway</h3><p>Every ingredient earns one point. Missing an ingredient or catching coffee ends your run. Your score can go on the global leaderboard.</p></div>
-<div class="how-group"><h3>Arcade 2.0</h3><p>Start with three lives. Catch ingredients in a row to build combos, unlock achievements and advance through five increasingly difficult levels.</p><p><strong>Power-ups:</strong> 2× points (30s), shield (15s), speed boost (30s), extra life, and a golden cup worth 50 points.</p><p class="how-note">Arcade scores do not count toward the Christmas giveaway.</p></div>
+<div class="how-group"><h3>Catch &amp; dodge</h3><span class="how-chip">🍓 Strawberry</span><span class="how-chip">🫐 Blueberry</span><span class="how-chip">🍯 Honey</span><span class="how-chip">🥛 Milk</span><span class="how-chip">🍵 Matcha</span><span class="how-chip">🍦 Vanilla</span><span class="how-chip">🥭 Mango</span><span class="how-chip">🍑 Peach</span><span class="how-chip">🍒 Cherry</span><span class="how-chip">🥥 Coconut</span><span class="how-chip">🍌 Banana</span><span class="how-chip">🍫 Chocolate</span><span class="how-chip">🍪 Cookie</span><p><strong>☕ Coffee</strong> is the obstacle. Don't catch it!</p></div>
+    <div class="how-group"><h3>Classic · Giveaway</h3><p>Catch ingredients, dodge coffee and climb the levels. The longer you play, the harder it gets. Your Classic score counts toward the giveaway.</p></div>
+    <div class="how-group"><h3>Arcade 2.0</h3><p>Three lives, faster levels, wild coffee storms and extra challenges. Boosts, combos and achievements make every run different.</p><p class="how-note">Arcade scores are just for fun — not the giveaway.</p></div>
 </section>
 </aside>
 </main>
@@ -190,7 +190,10 @@ let arcadeCaught = 0;
 let arcadeCombo = 0;
 let arcadeElapsed = 0;
 let arcadeSpawnTimer = 0;
-let arcadeBoosts = {double:0,shield:0,speed:0};
+let arcadeBoosts = {double:0,shield:0,speed:0,magnet:0,freeze:0,frenzy:0};
+let classicElapsed=0, classicLevel=1, classicCombo=0, classicCaught=0;
+let classicBoosts={shield:0,magnet:0,freeze:0,double:0,speed:0,frenzy:0};
+let classicBoostKind="";
 let arcadeBanner = "";
 let arcadeBannerUntil = 0;
 let arcadeInvulnerableUntil = 0;
@@ -201,14 +204,14 @@ let arcadeSoundEnabled = true;
 let arcadeAudio = null;
 let achievementToastUntil = 0;
 const achievementDefinitions = [
-    {id:"first",name:"First Catch",test:()=>arcadeCaught>=1},
-    {id:"ten",name:"Getting Started",test:()=>arcadeCaught>=10},
-    {id:"combo5",name:"On a Roll",test:()=>arcadeMaxCombo>=5},
-    {id:"combo10",name:"Combo Master",test:()=>arcadeMaxCombo>=10},
+    {id:"first",name:"First Catch",test:()=> (gameMode==="arcade"?arcadeCaught:classicCaught)>=1},
+    {id:"ten",name:"Getting Started",test:()=>(gameMode==="arcade"?arcadeCaught:classicCaught)>=10},
+    {id:"combo5",name:"On a Roll",test:()=>(gameMode==="arcade"?arcadeMaxCombo:classicCombo)>=5},
+    {id:"combo10",name:"Combo Master",test:()=>(gameMode==="arcade"?arcadeMaxCombo:classicCombo)>=10},
     {id:"score100",name:"Century Club",test:()=>score>=100},
-    {id:"level3",name:"Rising Barista",test:()=>arcadeLevel>=3},
-    {id:"level5",name:"Matcha Master",test:()=>arcadeLevel>=5},
-    {id:"survive",name:"Survivor",test:()=>arcadeElapsed>=120}
+    {id:"level3",name:"Rising Barista",test:()=>(gameMode==="arcade"?arcadeLevel:classicLevel)>=3},
+    {id:"level5",name:"Matcha Master",test:()=>(gameMode==="arcade"?arcadeLevel:classicLevel)>=5},
+    {id:"survive",name:"Survivor",test:()=>(gameMode==="arcade"?arcadeElapsed:classicElapsed)>=120}
 ];
 function unlockedAchievements() {
     try {const a=JSON.parse(localStorage.getItem("matchaRushAchievements")||"[]");return Array.isArray(a)?a:[];}
@@ -245,15 +248,15 @@ function playSound(kind) {
     } catch(e) { /* Audio is optional; gameplay always continues. */ }
 }
 function checkAchievements() {
-    if(gameMode!=="arcade") return;
+    // Achievements now work in both game modes.
     const unlocked=unlockedAchievements();
-    const newly=achievementDefinitions.filter(a=>!unlocked.includes(a.id)&&a.test());
+    const newly=achievementDefinitions.filter(a=>!unlocked.includes(gameMode+":"+a.id)&&a.test());
     if(!newly.length) return;
-    const updated=[...unlocked,...newly.map(a=>a.id)];
+    const updated=[...unlocked,...newly.map(a=>gameMode+":"+a.id)];
     try {localStorage.setItem("matchaRushAchievements",JSON.stringify(updated));}catch(e){}
     const toast=document.getElementById("achievement-toast");
     toast.textContent="Achievement unlocked: "+newly.map(a=>a.name).join(" · ");
-    toast.classList.remove("hidden");achievementToastUntil=arcadeElapsed+3;
+    toast.classList.remove("hidden");achievementToastUntil=(gameMode==="arcade"?arcadeElapsed:classicElapsed)+3;
     playSound("achievement");
 }
 document.getElementById("sound-toggle").addEventListener("click",()=>{
@@ -270,8 +273,10 @@ const goodIngredients = [
     "🍓",
     "🫐",
     "🍯",
-    "🥛"
+    "🥛", "🍵", "🍦", "🥭", "🍑", "🍒", "🥥", "🍌", "🍫", "🍪"
 ];
+// Matcha powder, vanilla, mango, peach, cherry, coconut, banana, chocolate and cookie flavours.
+const powerEmoji={shield:"🛡️",magnet:"🧲",freeze:"❄️",double:"⭐",speed:"⚡",frenzy:"🍓"};
 
 let food = "🍓";
 
@@ -304,6 +309,13 @@ function draw() {
 
     frameStep = Math.min(deltaTime / (1000 / 60), 2);
     if (playing && !gameOver) {
+        if(gameMode==="classic") {
+            classicElapsed+=Math.min(deltaTime/1000,.05);
+            const nextLevel=1+Math.floor(classicElapsed/45);
+            if(nextLevel>classicLevel){classicLevel=nextLevel;playSound("level");arcadeMessage("LEVEL "+classicLevel+"!",2);}
+            if(achievementToastUntil && classicElapsed>=achievementToastUntil){document.getElementById("achievement-toast").classList.add("hidden");achievementToastUntil=0;}
+            checkAchievements();updateArcadeHud();
+        }
         movePlayer();
         if (gameMode === "arcade") updateArcade();
         else { moveFood(); checkCollision(); }
@@ -319,7 +331,7 @@ function draw() {
 
 
 function drawBackground() {
-    background(gameMode === "arcade" ? ["#b9cf8c","#b5d3a4","#c3d1a0","#d9b5bc","#a2c49a"][arcadeLevel-1] : "#b9cf8c");
+    background(gameMode === "arcade" ? ["#b9cf8c","#b5d3a4","#c3d1a0","#d9b5bc","#a2c49a"][(arcadeLevel-1)%5] : "#b9cf8c");
 
     fill(255, 255, 255, 25);
 
@@ -341,7 +353,7 @@ function drawBackground() {
 
 
 function movePlayer() {
-    const moveSpeed = gameMode === "arcade" && arcadeBoosts.speed > arcadeElapsed ? 8 : 5;
+    const moveSpeed = ((gameMode === "arcade" ? arcadeBoosts.speed > arcadeElapsed : classicBoosts.speed > classicElapsed) ? 8 : 5);
     if (
         keyIsDown(LEFT_ARROW) ||
         moveLeft == true
@@ -367,18 +379,18 @@ function movePlayer() {
 
 
 function moveFood() {
-    let foodSpeed = 3 + score * 0.12;
-
-    if (foodSpeed > 7) {
-        foodSpeed = 7;
-    }
+    let foodSpeed = Math.min(16,3 + classicElapsed*.014 + (classicLevel-1)*.32 + classicCaught*.015);
+    if(classicBoosts.freeze>classicElapsed) foodSpeed*=.5;
+    if(classicBoosts.magnet>classicElapsed && food!=="☕" && !classicBoostKind && foodY>160) foodX+=(playerX-foodX)*Math.min(.12*frameStep, .3);
 
     foodY = foodY + foodSpeed * frameStep;
 
     if (foodY > 500) {
 
-        if (food == "☕") {
+        if (food == "☕" || classicBoostKind) {
             newFood();
+        } else if(classicBoosts.shield>classicElapsed){
+            classicBoosts.shield=0;classicCombo=0;newFood();playSound("boost");
         } else {
             playSound("over");
             endGame(
@@ -390,7 +402,7 @@ function moveFood() {
 
 
 function drawPlayer() {
-    if (gameMode === "arcade" && arcadeBoosts.shield > arcadeElapsed) {
+    if ((gameMode === "arcade" && arcadeBoosts.shield > arcadeElapsed) || (gameMode === "classic" && classicBoosts.shield>classicElapsed)) {
         fill(255,255,255,90); circle(playerX,playerY,75); noFill(); stroke("#f7f7ff"); strokeWeight(3); circle(playerX,playerY,70); noStroke();
     }
     textSize(48);
@@ -407,10 +419,11 @@ function drawFood() {
     textSize(32);
 
     text(
-        food,
+        classicBoostKind ? powerEmoji[classicBoostKind] : food,
         foodX,
         foodY
     );
+    if(playing && !gameOver && arcadeBannerUntil>classicElapsed){fill("#314c2a");textSize(20);textStyle(BOLD);text(arcadeBanner,width/2,90);textStyle(NORMAL);noStroke();}
 }
 
 
@@ -424,15 +437,15 @@ function checkCollision() {
 
     if (distance < 38) {
 
-        if (food == "☕") {
-
-            playSound("coffee");
-            endGame(
-                "Coffee ruined the matcha ☕"
-            );
-
+        if(classicBoostKind){
+            classicBoosts[classicBoostKind]=classicElapsed+(classicBoostKind==="shield"?15:classicBoostKind==="freeze"?8:classicBoostKind==="magnet"?10:classicBoostKind==="frenzy"?10:30);
+            arcadeMessage(classicBoostKind.toUpperCase()+" BOOST!",2);playSound("boost");newFood();
+        } else if (food == "☕") {
+            if(classicBoosts.shield>classicElapsed){classicBoosts.shield=0;classicCombo=0;playSound("boost");newFood();}
+            else {playSound("coffee");endGame("Coffee ruined the matcha ☕");}
         } else {
-
+            classicCaught++;classicCombo++;
+            // Giveaway points remain one per ingredient; multipliers are visual-only in Classic.
             score = score + 1;
             playSound("catch");
 
@@ -448,6 +461,7 @@ function checkCollision() {
 
 function newFood() {
     foodY = -30;
+    classicBoostKind = (playing && gameMode==="classic" && classicCaught>=3 && random(1)<.075) ? random(["shield","magnet","freeze","speed"]) : "";
 
     foodX = random(
         35,
@@ -456,7 +470,7 @@ function newFood() {
 
     let coffeeChance = random(1);
 
-    if (coffeeChance < 0.2) {
+    if (coffeeChance < Math.min(.42,.2+classicElapsed*.00035)) {
 
         food = "☕";
 
@@ -585,6 +599,7 @@ function endGame(message) {
         const unlocked=unlockedAchievements();
         summary.textContent="Arcade best: "+arcadeBest+" · Max combo: "+arcadeMaxCombo+" · Achievements: "+unlocked.length+"/"+achievementDefinitions.length+(unlocked.length?" · "+achievementDefinitions.filter(a=>unlocked.includes(a.id)).map(a=>a.name).join(", "):"");
     }
+    if(!arcadeRun){checkAchievements();summary.hidden=false;summary.textContent="Level "+classicLevel+" · Max combo "+classicCombo+" · Survival "+Math.floor(classicElapsed)+"s";}
     document.querySelector('label[for="player-name"]').hidden = arcadeRun;
     document.querySelector('.save-score-row').hidden = arcadeRun;
     if (arcadeRun) document.getElementById("save-message").textContent = "Arcade is practice mode. Christmas giveaway scores stay fair in Classic ♡";
@@ -604,6 +619,7 @@ function restartGame() {
 
     particles = [];
     if (gameMode === "arcade") resetArcade();
+    else {classicElapsed=0;classicLevel=1;classicCombo=0;classicCaught=0;classicBoostKind="";classicBoosts={shield:0,magnet:0,freeze:0,double:0,speed:0,frenzy:0};arcadeBannerUntil=0;document.getElementById("achievement-toast").classList.add("hidden");updateArcadeHud();}
 
     document.getElementById(
         "game-over-panel"
@@ -745,7 +761,7 @@ function connectDatabase() {
 async function loadLeaderboard() {
     if (!database) return;
     try {
-        // Read scores in pages so duplicate submissions do not consume the top ten.
+        // Read scores in pages so duplicate submissions do not consume the top four.
         // A player's highest score wins; names are compared case-insensitively.
         const bestByName = new Map();
         const pageSize = 1000;
@@ -769,7 +785,7 @@ async function loadLeaderboard() {
         }
         const topPlayers = [...bestByName.values()]
             .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
-            .slice(0, 10);
+            .slice(0, 4);
         showLeaderboard(topPlayers);
     } catch (error) {
         console.error("Leaderboard error:", error);
@@ -1033,7 +1049,7 @@ document.getElementById(
 function resetArcade() {
     arcadeItems=[]; arcadeLives=3; arcadeLevel=1; arcadeCaught=0;
     arcadeCombo=0; arcadeMaxCombo=0; arcadeElapsed=0; arcadeSpawnTimer=0;
-    arcadeBoosts={double:0,shield:0,speed:0};
+    arcadeBoosts={double:0,shield:0,speed:0,magnet:0,freeze:0,frenzy:0};
     arcadeStormUntil=0; arcadeInvulnerableUntil=0;
     arcadeBanner="READY, SET, MATCHA! ♡"; arcadeBannerUntil=2;
     document.getElementById("achievement-toast").classList.add("hidden");
@@ -1049,12 +1065,12 @@ function arcadeSpawn() {
         else if (bonus<.48) {kind="shield";emoji="🛡️";}
         else if (bonus<.70) {kind="speed";emoji="⚡";}
         else if (bonus<.88) {kind="heart";emoji="💗";}
-        else {kind="gold";emoji="🏆";}
+        else {kind=random(["gold","magnet","freeze","frenzy"]);emoji=({gold:"🏆",magnet:"🧲",freeze:"❄️",frenzy:"🍓"})[kind];}
     }
-    arcadeItems.push({x:random(38,602),y:-30,emoji,kind,speed:random(2.6,4.2)+arcadeLevel*.9});
+    arcadeItems.push({x:random(38,602),y:-30,emoji,kind,speed:random(2.6,4.2)+arcadeLevel*.65+arcadeElapsed*.012,phase:random(100),wave:gameMode==="arcade"&&arcadeLevel>=3&&random(1)<.3});
 }
 function arcadeMessage(message,duration=1.5) {
-    arcadeBanner=message;arcadeBannerUntil=arcadeElapsed+duration;
+    arcadeBanner=message;arcadeBannerUntil=(gameMode==="classic"?classicElapsed:arcadeElapsed)+duration;
 }
 function arcadeHurt() {
     if (arcadeBoosts.shield>arcadeElapsed || arcadeInvulnerableUntil>arcadeElapsed) return;
@@ -1065,8 +1081,8 @@ function arcadeHurt() {
 }
 function arcadeCatch(item) {
     if (item.kind==="coffee") {arcadeHurt();return;}
-    if (item.kind==="double" || item.kind==="speed" || item.kind==="shield") {
-        const seconds=item.kind==="shield"?15:30;
+    if (["double","speed","shield","magnet","freeze","frenzy"].includes(item.kind)) {
+        const seconds=({shield:15,magnet:10,freeze:8,frenzy:10})[item.kind]||30;
         arcadeBoosts[item.kind]=arcadeElapsed+seconds;
         arcadeMessage(item.kind.toUpperCase()+" BOOST ACTIVATED!",2);playSound("boost");
     } else if (item.kind==="heart") {
@@ -1081,9 +1097,9 @@ function arcadeCatch(item) {
         playSound(arcadeCombo%5===0?"combo":"catch");
         if (arcadeCombo%10===0) {score+=10*multiplier;arcadeMessage("10 COMBO! +"+(10*multiplier));}
         else if (item.kind==="gold") arcadeMessage("GOLDEN MATCHA +"+(50*multiplier));
-        const newLevel=Math.min(5,1+Math.floor(arcadeCaught/15));
+        const newLevel=1+Math.floor(arcadeCaught/15)+Math.floor(arcadeElapsed/50);
         if (newLevel>arcadeLevel) {
-            arcadeLevel=newLevel;arcadeMessage("LEVEL "+arcadeLevel+"! "+arcadeLevelNames[arcadeLevel-1],2.5);playSound("level");
+            arcadeLevel=newLevel;arcadeMessage("LEVEL "+arcadeLevel+"! "+arcadeLevelNames[(arcadeLevel-1)%arcadeLevelNames.length],2.5);playSound("level");
         }
         if (arcadeLevel>=4 && arcadeCaught%22===0) {
             arcadeStormUntil=arcadeElapsed+10;arcadeMessage("COFFEE STORM!",2);
@@ -1105,11 +1121,13 @@ function updateArcade() {
     }
     checkAchievements();
     const storm=arcadeStormUntil>arcadeElapsed;
-    const interval=Math.max(.25,1.12-(arcadeLevel-1)*.16)*(storm?.48:1);
+    const interval=Math.max(.16,1.12-(arcadeLevel-1)*.065-arcadeElapsed*.001)*(storm?.48:1)*(arcadeBoosts.frenzy>arcadeElapsed?.7:1);
     while(arcadeSpawnTimer>=interval) {arcadeSpawnTimer-=interval;arcadeSpawn();}
     for(let i=arcadeItems.length-1;i>=0;i--) {
         const item=arcadeItems[i];
-        item.y+=item.speed*frameStep*(storm?1.25:1);
+        item.y+=item.speed*frameStep*(storm?1.25:1)*(arcadeBoosts.freeze>arcadeElapsed?.5:1);
+        if(item.wave)item.x=Math.max(30,Math.min(610,item.x+Math.sin(arcadeElapsed*5+item.phase)*2.5*frameStep));
+        if(arcadeBoosts.magnet>arcadeElapsed && item.kind==="good" && item.y>140)item.x+=(playerX-item.x)*Math.min(.12*frameStep,.3);
         if(dist(playerX,playerY,item.x,item.y)<37) {
             arcadeItems.splice(i,1);arcadeCatch(item);
             if(gameOver) break;
@@ -1131,22 +1149,22 @@ function drawArcade() {
     }
 }
 function updateArcadeHud() {
-    document.getElementById("level-label").textContent="Level "+arcadeLevel+" · "+arcadeLevelNames[arcadeLevel-1];
-    document.getElementById("lives-label").textContent="💗".repeat(arcadeLives)+"♡".repeat(3-arcadeLives);
-    const boosts=[["⭐ 2×",arcadeBoosts.double],["🛡️",arcadeBoosts.shield],["⚡",arcadeBoosts.speed]]
-      .filter(([,end])=>end>arcadeElapsed).map(([label,end])=>label+" "+Math.ceil(end-arcadeElapsed)+"s");
+    const isClassic=gameMode==="classic",lvl=isClassic?classicLevel:arcadeLevel,elapsed=isClassic?classicElapsed:arcadeElapsed,boostsNow=isClassic?classicBoosts:arcadeBoosts;
+    document.getElementById("level-label").textContent="Level "+lvl+" · "+arcadeLevelNames[(lvl-1)%arcadeLevelNames.length];
+    document.getElementById("lives-label").textContent=isClassic?"Survive & level up":"💗".repeat(arcadeLives)+"♡".repeat(3-arcadeLives);
+    const boosts=Object.entries(boostsNow).filter(([,end])=>end>elapsed).map(([kind,end])=>powerEmoji[kind]+" "+Math.ceil(end-elapsed)+"s");
     document.getElementById("boost-label").textContent=boosts.join(" · ") || "Catch a power-up!";
-    document.getElementById("combo-label").textContent="Combo "+arcadeCombo;
+    document.getElementById("combo-label").textContent="Combo "+(isClassic?classicCombo:arcadeCombo);
 }
 function setMode(mode) {
     if (playing && !gameOver) return;
     gameMode=mode;
     document.getElementById("classic-mode").classList.toggle("mode-selected",mode==="classic");
     document.getElementById("arcade-mode").classList.toggle("mode-selected",mode==="arcade");
-    document.getElementById("arcade-hud").hidden=mode!=="arcade";
+    document.getElementById("arcade-hud").hidden=false;
     document.getElementById("achievement-toast").classList.add("hidden");
-    document.getElementById("mode-description").textContent=mode==="classic"?"Classic mode · original giveaway scoring":"Arcade 2.0 · 5 levels, 3 lives, power-ups!";
-    document.getElementById("game-tip").textContent=mode==="classic"?"Classic: missing an ingredient ends the run.":"Arcade: 3 lives · power-ups · combo bonuses · coffee storms!";
+    document.getElementById("mode-description").textContent=mode==="classic"?"Classic · endless levels, boosters and original giveaway scoring":"Arcade 2.0 · endless levels, 3 lives, power-ups!";
+    document.getElementById("game-tip").textContent=mode==="classic"?"Classic: harder every minute · levels · boosters · one point per ingredient.":"Arcade: 3 lives · endless levels · combo bonuses · coffee storms!";
     document.querySelector('label[for="player-name"]').hidden=mode!=="classic";
     document.querySelector('.save-score-row').hidden=mode!=="classic";
     if(gameOver) {
@@ -1154,7 +1172,7 @@ function setMode(mode) {
         document.getElementById("start-panel").hidden=false;
         playing=false;
     }
-    if(mode==="arcade") resetArcade();
+    if(mode==="arcade") resetArcade();else updateArcadeHud();
 }
 document.getElementById("classic-mode").addEventListener("click",()=>setMode("classic"));
 document.getElementById("arcade-mode").addEventListener("click",()=>setMode("arcade"));
