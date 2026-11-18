@@ -55,6 +55,11 @@ footer { font-size: .85rem; }
 a { color: inherit; }
 @media (max-width: 760px) { main { grid-template-columns: minmax(0, 1fr); max-width: 560px; } header { padding: 14px 0; } }
 @media (orientation: landscape) and (max-height: 600px) { main { max-width: min(580px, 108dvh); } }
+.mode-picker {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.mode-picker button {background:#e8d8df;color:#344b2c;font-size:.85rem;padding:8px 4px}
+.mode-picker button.mode-selected {background:#314c2a;color:white}
+.arcade-hud {display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:5px;padding:8px;background:#e5edcf;border-radius:12px;margin-bottom:8px;font-size:.8rem}
+.arcade-hud #boost-label {color:#76516b;font-weight:800}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/p5@1/lib/p5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -68,6 +73,8 @@ a { color: inherit; }
 </header>
 <main>
 <section class="game-card" aria-label="Matcha Rush game">
+<div class="mode-picker"><button id="classic-mode" class="mode-selected" type="button">🏆 Classic · Giveaway</button><button id="arcade-mode" type="button">✨ Arcade 2.0</button></div>
+<div id="arcade-hud" class="arcade-hud" hidden><strong id="level-label">Level 1 · Matcha Beginner</strong><span id="lives-label">💗💗💗</span><span id="boost-label">Catch a power-up!</span></div>
 <div class="stats">
 <div class="stat"><span>Score</span><strong id="score">0 ♡</strong></div>
 <div class="stat"><span>Personal best</span><strong id="high-score">0</strong></div>
@@ -79,7 +86,7 @@ a { color: inherit; }
 <div class="overlay-card">
 <h2>Ready to whisk? 🍵</h2>
 <p>Drag your cup or use the arrows.</p>
-<p>have fun xoxo xxx</p>
+<p id="mode-description">Classic mode · original giveaway scoring</p><p>have fun xoxo xxx</p>
 <button id="start-button" type="button">Play ♡</button>
 </div>
 </div>
@@ -102,18 +109,18 @@ a { color: inherit; }
 <button id="move-left" type="button" aria-label="Move left">←</button>
 <button id="move-right" type="button" aria-label="Move right">→</button>
 </div>
-<p class="game-tip">Catch every ingredient. Missing one ends the run.</p>
+<p class="game-tip" id="game-tip">Classic: missing an ingredient ends the run. Arcade: 3 lives, levels and boosts!</p>
 </section>
 <aside>
 <section>
 <h2>Matcha Legends ♡</h2>
-<p>Top 3 global players</p>
+<p>Top 3 global players · Classic giveaway scores only</p>
 <div id="leaderboard-list">Loading leaderboard…</div>
 </section>
 <section>
 <h2>How to play</h2>
 <p>Use ← → on your keyboard, tap or hold the on-screen arrows, or drag your cup.</p>
-<p>🍓 Catch ingredients · ☕ Dodge coffee</p>
+<p>🍓 Catch ingredients · ☕ Dodge coffee</p><p>✨ Arcade: collect ⭐ 2× points (30s), 🛡️ shield (15s), ⚡ speed (30s), 💗 extra lives, 🏆 golden cup (+50), and survive coffee storms!</p>
 </section>
 </aside>
 </main>
@@ -157,6 +164,21 @@ let moveLeft = false;
 let moveRight = false;
 
 let particles = [];
+let gameMode = "classic";
+let arcadeItems = [];
+let arcadeLives = 3;
+let arcadeLevel = 1;
+let arcadeCaught = 0;
+let arcadeCombo = 0;
+let arcadeElapsed = 0;
+let arcadeSpawnTimer = 0;
+let arcadeBoosts = {double:0,shield:0,speed:0};
+let arcadeBanner = "";
+let arcadeBannerUntil = 0;
+let arcadeInvulnerableUntil = 0;
+let arcadeStormUntil = 0;
+const arcadeLevelNames = ["Matcha Beginner","Barista Era","Matcha Madness","Caffeine Chaos","Matcha Queen"];
+
 
 const goodIngredients = [
     "🍓",
@@ -197,18 +219,21 @@ function draw() {
     frameStep = Math.min(deltaTime / (1000 / 60), 2);
     if (playing && !gameOver) {
         movePlayer();
-        moveFood();
-        checkCollision();
+        if (gameMode === "arcade") updateArcade();
+        else { moveFood(); checkCollision(); }
     }
 
-    drawFood();
+    if (gameMode === "arcade") drawArcade();
+    else drawFood();
     drawPlayer();
     drawParticles();
+    document.getElementById("classic-mode").disabled=playing&&!gameOver;
+    document.getElementById("arcade-mode").disabled=playing&&!gameOver;
 }
 
 
 function drawBackground() {
-    background("#b9cf8c");
+    background(gameMode === "arcade" ? ["#b9cf8c","#b5d3a4","#c3d1a0","#d9b5bc","#a2c49a"][arcadeLevel-1] : "#b9cf8c");
 
     fill(255, 255, 255, 25);
 
@@ -230,18 +255,19 @@ function drawBackground() {
 
 
 function movePlayer() {
+    const moveSpeed = gameMode === "arcade" && arcadeBoosts.speed > arcadeElapsed ? 8 : 5;
     if (
         keyIsDown(LEFT_ARROW) ||
         moveLeft == true
     ) {
-        playerX = playerX - 5 * frameStep;
+        playerX = playerX - moveSpeed * frameStep;
     }
 
     if (
         keyIsDown(RIGHT_ARROW) ||
         moveRight == true
     ) {
-        playerX = playerX + 5 * frameStep;
+        playerX = playerX + moveSpeed * frameStep;
     }
 
     if (playerX < 30) {
@@ -277,6 +303,9 @@ function moveFood() {
 
 
 function drawPlayer() {
+    if (gameMode === "arcade" && arcadeBoosts.shield > arcadeElapsed) {
+        fill(255,255,255,90); circle(playerX,playerY,75); noFill(); stroke("#f7f7ff"); strokeWeight(3); circle(playerX,playerY,70); noStroke();
+    }
     textSize(48);
 
     text(
@@ -411,9 +440,9 @@ function endGame(message) {
         lastScore
     );
 
-    document.getElementById("record").hidden = score <= highScore;
+    document.getElementById("record").hidden = gameMode !== "classic" || score <= highScore;
 
-    if (score > highScore) {
+    if (gameMode === "classic" && score > highScore) {
 
         highScore = score;
 
@@ -458,6 +487,10 @@ function endGame(message) {
     ).textContent = "Save score ♡";
 
     scoreSaved = false;
+    const arcadeRun = gameMode === "arcade";
+    document.querySelector('label[for="player-name"]').hidden = arcadeRun;
+    document.querySelector('.save-score-row').hidden = arcadeRun;
+    if (arcadeRun) document.getElementById("save-message").textContent = "Arcade is practice mode. Christmas giveaway scores stay fair in Classic ♡";
 }
 
 
@@ -473,6 +506,7 @@ function restartGame() {
     playerX = 320;
 
     particles = [];
+    if (gameMode === "arcade") resetArcade();
 
     document.getElementById(
         "game-over-panel"
@@ -811,7 +845,7 @@ async function saveScore() {
         return;
     }
 
-    if (!gameOver || scoreSaved || saving) {
+    if (gameMode !== "classic" || !gameOver || scoreSaved || saving) {
         return;
     }
 
@@ -929,6 +963,125 @@ document.getElementById(
     }
 );
 
+
+
+// Arcade 2.0 is separate from the Classic Christmas giveaway leaderboard.
+function resetArcade() {
+    arcadeItems=[]; arcadeLives=3; arcadeLevel=1; arcadeCaught=0;
+    arcadeCombo=0; arcadeElapsed=0; arcadeSpawnTimer=0;
+    arcadeBoosts={double:0,shield:0,speed:0};
+    arcadeStormUntil=0; arcadeInvulnerableUntil=0;
+    arcadeBanner="READY, SET, MATCHA! ♡"; arcadeBannerUntil=2;
+    updateArcadeHud();
+}
+function arcadeSpawn() {
+    const r=random(1), storm=arcadeStormUntil>arcadeElapsed;
+    let kind="good", emoji=random(goodIngredients);
+    if (r < (storm ? .63 : .19+arcadeLevel*.035)) {kind="coffee";emoji="☕";}
+    else if (r < .25+arcadeLevel*.035 && !storm) {
+        const bonus=random(1);
+        if (bonus<.25) {kind="double";emoji="⭐";}
+        else if (bonus<.48) {kind="shield";emoji="🛡️";}
+        else if (bonus<.70) {kind="speed";emoji="⚡";}
+        else if (bonus<.88) {kind="heart";emoji="💗";}
+        else {kind="gold";emoji="🏆";}
+    }
+    arcadeItems.push({x:random(38,602),y:-30,emoji,kind,speed:random(2.6,4.2)+arcadeLevel*.9});
+}
+function arcadeMessage(message,duration=1.5) {
+    arcadeBanner=message;arcadeBannerUntil=arcadeElapsed+duration;
+}
+function arcadeHurt() {
+    if (arcadeBoosts.shield>arcadeElapsed || arcadeInvulnerableUntil>arcadeElapsed) return;
+    arcadeLives--;arcadeCombo=0;
+    arcadeInvulnerableUntil=arcadeElapsed+1.2;
+    arcadeMessage("OUCH! 💔");
+    if (arcadeLives<=0) endGame("Matcha spilled 💔");
+}
+function arcadeCatch(item) {
+    if (item.kind==="coffee") {arcadeHurt();return;}
+    if (item.kind==="double" || item.kind==="speed" || item.kind==="shield") {
+        const seconds=item.kind==="shield"?15:30;
+        arcadeBoosts[item.kind]=arcadeElapsed+seconds;
+        arcadeMessage(item.emoji+" BOOST ACTIVATED!",2);
+    } else if (item.kind==="heart") {
+        arcadeLives=Math.min(3,arcadeLives+1);arcadeMessage("EXTRA LIFE! 💗");
+    } else {
+        const multiplier=arcadeBoosts.double>arcadeElapsed?2:1;
+        score+=(item.kind==="gold"?50:1)*multiplier;
+        arcadeCaught++;arcadeCombo++;
+        if (arcadeCombo%10===0) {score+=10*multiplier;arcadeMessage("10 COMBO! +"+(10*multiplier)+" ✨");}
+        else if (item.kind==="gold") arcadeMessage("GOLDEN MATCHA +"+(50*multiplier)+" 🏆");
+        const newLevel=Math.min(5,1+Math.floor(arcadeCaught/15));
+        if (newLevel>arcadeLevel) {
+            arcadeLevel=newLevel;arcadeMessage("LEVEL "+arcadeLevel+"! "+arcadeLevelNames[arcadeLevel-1],2.5);
+        }
+        if (arcadeLevel>=4 && arcadeCaught%22===0) {
+            arcadeStormUntil=arcadeElapsed+10;arcadeMessage("COFFEE STORM! ☕",2);
+        }
+        makeArcadeParticles(item.x,item.y);
+        updateScoreBoard();
+    }
+    updateArcadeHud();
+}
+function makeArcadeParticles(x,y) {
+    for(let i=0;i<8;i++) particles.push({x,y,speedX:random(-3,3),speedY:random(-3,-1),life:35});
+}
+function updateArcade() {
+    const dt=Math.min(deltaTime/1000,.05);
+    arcadeElapsed+=dt;arcadeSpawnTimer+=dt;
+    const storm=arcadeStormUntil>arcadeElapsed;
+    const interval=Math.max(.25,1.12-(arcadeLevel-1)*.16)*(storm?.48:1);
+    while(arcadeSpawnTimer>=interval) {arcadeSpawnTimer-=interval;arcadeSpawn();}
+    for(let i=arcadeItems.length-1;i>=0;i--) {
+        const item=arcadeItems[i];
+        item.y+=item.speed*frameStep*(storm?1.25:1);
+        if(dist(playerX,playerY,item.x,item.y)<37) {
+            arcadeItems.splice(i,1);arcadeCatch(item);
+            if(gameOver) break;
+        } else if(item.y>510) {
+            arcadeItems.splice(i,1);
+            if(item.kind==="good" || item.kind==="gold") {
+                arcadeCombo=0;arcadeHurt();if(gameOver) break;
+            }
+        }
+    }
+    updateArcadeHud();
+}
+function drawArcade() {
+    textSize(32);
+    for(const item of arcadeItems) text(item.emoji,item.x,item.y);
+    if(arcadeBannerUntil>arcadeElapsed) {
+        fill("#314c2a");textSize(22);textStyle(BOLD);
+        text(arcadeBanner,width/2,95);textStyle(NORMAL);noStroke();
+    }
+}
+function updateArcadeHud() {
+    document.getElementById("level-label").textContent="Level "+arcadeLevel+" · "+arcadeLevelNames[arcadeLevel-1];
+    document.getElementById("lives-label").textContent="💗".repeat(arcadeLives)+"♡".repeat(3-arcadeLives);
+    const boosts=[["⭐ 2×",arcadeBoosts.double],["🛡️",arcadeBoosts.shield],["⚡",arcadeBoosts.speed]]
+      .filter(([,end])=>end>arcadeElapsed).map(([label,end])=>label+" "+Math.ceil(end-arcadeElapsed)+"s");
+    document.getElementById("boost-label").textContent=boosts.join(" · ") || "Catch a power-up!";
+}
+function setMode(mode) {
+    if (playing && !gameOver) return;
+    gameMode=mode;
+    document.getElementById("classic-mode").classList.toggle("mode-selected",mode==="classic");
+    document.getElementById("arcade-mode").classList.toggle("mode-selected",mode==="arcade");
+    document.getElementById("arcade-hud").hidden=mode!=="arcade";
+    document.getElementById("mode-description").textContent=mode==="classic"?"Classic mode · original giveaway scoring":"Arcade 2.0 · 5 levels, 3 lives, power-ups!";
+    document.getElementById("game-tip").textContent=mode==="classic"?"Classic: missing an ingredient ends the run.":"Arcade: 3 lives · power-ups · combo bonuses · coffee storms!";
+    document.querySelector('label[for="player-name"]').hidden=mode!=="classic";
+    document.querySelector('.save-score-row').hidden=mode!=="classic";
+    if(gameOver) {
+        document.getElementById("game-over-panel").classList.add("hidden");
+        document.getElementById("start-panel").hidden=false;
+        playing=false;
+    }
+    if(mode==="arcade") resetArcade();
+}
+document.getElementById("classic-mode").addEventListener("click",()=>setMode("classic"));
+document.getElementById("arcade-mode").addEventListener("click",()=>setMode("arcade"));
 
 document.getElementById("start-button").addEventListener("click", restartGame);
 setupMobileControls();
